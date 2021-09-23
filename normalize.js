@@ -1,9 +1,13 @@
 import util from 'util';
 import fs from 'fs';
-let data = JSON.parse(fs.readFileSync('normalizedData.json', 'utf-8'))
+import { v4 as uuidv4 } from 'uuid';
+let data = JSON.parse(fs.readFileSync('denormalizedData.json', 'utf-8'))
 const component = {
     lists: {},
-    inputs: {}
+    inputs: {},
+    metadata: {
+      componentStructure: []
+    }, 
 }
 
 const changeComponent = (type, payload) => {
@@ -12,44 +16,66 @@ const changeComponent = (type, payload) => {
 const mapComponent = (data, component) => {
      Object.entries(data).map(([key, value]) => {
       if (value.type == "list") {
-        handleList(value,null, component);
+        const listId = handleList(value, null, component);
+        component.metadata.componentStructure.push({
+          id: listId,
+          type: "list",
+          name: value.name
+        })
       }
       if (value.type == "input") {
+        if (!value.id){
+          value.id = uuidv4().substring(0, 8)
+        }
+        if (!value.parentId){
+          value.parentId = null
+        }
         changeComponent("inputs", value)
+        component.metadata.componentStructure.push({
+          id: value.id,
+          type: "input",
+          name: value.name
+        })
       }
     })
     console.log(util.inspect(component, {showHidden: false, depth: null, colors: true}))
-  }
-  const handleList = (data, parentId = null, result) => {
-    let list = {
-      id: data.id,
-      name: data.name,
-      parentId: parentId,
-      type: data.type,
-      hidden: data.hidden,
-      limit: data.limit || null,
-      lists: null, 
-      inputs: null
+    return component
+}
+  const handleList = (data, parentId = null) => {
+    const list = {}
+    Object.keys(data).map(item => {
+      if (item !== "children" ) {
+        list[item] = data[item];
+      }
+    })
+    if (!list.id){
+      list.id = uuidv4().substring(0, 8)
     }
+    if (!list.parentId){
+      list.parentId = parentId
+    }
+    
     const lists = [];
     const inputs = []
     data.children.map((child) => {
         if (child.type === 'list') {
-            handleList(child, data.id, result);
-            lists.push(child.id)
+            lists.push(handleList(child, list.id))
         } 
         if (child.type === 'input') {
-            changeComponent("inputs", child)
-            inputs.push(child.id)
+          if (!child.id){
+            child.id = uuidv4().substring(0, 8)
+          }
+          if (!child.parentId){
+            child.parentId = list.id
+          }
+          changeComponent("inputs", child)
+          inputs.push(child.id)
         }
     })
     list.lists = lists;
     list.inputs = inputs;
     changeComponent("lists", list)
+    return list.id
   }
   
-  const handleInput = (data)=> {
-    return data;
-  }
-  
-  mapComponent(data,component)
+  fs.writeFileSync("normalizedData.json", JSON.stringify(mapComponent(data,component), null, 2));

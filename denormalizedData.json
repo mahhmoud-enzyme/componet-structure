@@ -1,0 +1,66 @@
+{
+  "title": {
+    "name": "title",
+    "parentId": null,
+    "type": "input",
+    "inputType": "textarea",
+    "hidden": false,
+    "value": "hello world",
+    "id": "a0d582d4"
+  },
+  "logos": {
+    "children": [
+      {
+        "children": [
+          {
+            "name": "mini logo",
+            "type": "input",
+            "hidden": false,
+            "inputType": "image",
+            "value": "example.com",
+            "id": "e5281e4e",
+            "parentId": "7d0be09c"
+          }
+        ],
+        "name": "mini logos",
+        "hidden": false,
+        "limit": 4,
+        "type": "list",
+        "id": "7d0be09c",
+        "parentId": "98dc3d70"
+      },
+      {
+        "name": "logo 1",
+        "type": "input",
+        "inputType": "image",
+        "hidden": false,
+        "value": "example.com",
+        "id": "b74249ff",
+        "parentId": "98dc3d70"
+      },
+      {
+        "name": "logo 2",
+        "type": "input",
+        "inputType": "image",
+        "hidden": false,
+        "value": "example.com",
+        "id": "f463cd55",
+        "parentId": "98dc3d70"
+      },
+      {
+        "name": "logo 3",
+        "type": "input",
+        "inputType": "image",
+        "hidden": false,
+        "id": "5c162b8e",
+        "parentId": "98dc3d70"
+      }
+    ],
+    "parentId": null,
+    "name": "logos",
+    "hidden": false,
+    "limit": 4,
+    "type": "list",
+    "id": "98dc3d70"
+  }
+}

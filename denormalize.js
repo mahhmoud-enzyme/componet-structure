@@ -1,6 +1,6 @@
 import util from 'util';
 import fs from 'fs';
-let component = JSON.parse(fs.readFileSync('denormailzedData.json', 'utf-8'))
+let component = JSON.parse(fs.readFileSync('normalizedData.json', 'utf-8'))
 
 const lists = component.lists;
 const inputs = component.inputs;
@@ -16,17 +16,16 @@ const mapConfig = (fields) => {
     }
   })
   console.log(util.inspect(result, {showHidden: false, depth: null, colors: true}))
+  return result;
 }
 const handleList = (data) => {  
-  let result = {
-    id: data.id,
-    name: data.name,
-    hidden: data.hidden,
-    limit: data.limit || null,
-    parentId: data.parentId,
-    type: "list",
-    children: []
-  }
+  let result = {children: []};
+  Object.keys(data).map(item => {
+    if (item !== "lists" && item !== "inputs") {
+      result[item] = data[item];
+    }
+  })
+
   if (data.lists){
      data.lists.map(list => {
       result.children.push(handleList(lists[list]))
@@ -44,4 +43,5 @@ const handleInput = (data)=> {
   return data;
 }
 
-mapConfig(fields)
+
+fs.writeFileSync("denormalizedData.json", JSON.stringify(mapConfig(fields), null, 2));
